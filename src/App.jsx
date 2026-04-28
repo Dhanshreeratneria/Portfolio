@@ -331,15 +331,15 @@ const App = () => {
       title: "TerraFlow – Water Management",
       description: "Full-stack system managing 13+ service categories with role-based authentication. Real-time tracking via Firebase boosted response efficiency by 40-50%.",
       technologies: ["React.js", "Firebase", "Firestore", "RBAC"],
-      link: "https://cwsms.vercel.app/",
-      github: "https://github.com/Dhanshreeratneria/CWSMS"
+      link: "https://terraflow-drilling-solution-and-services-red7tapxb.vercel.app/home",
+      github: "https://github.com/Dhanshreeratneria/Terraflow-Drilling-Solution-and-Services"
     },
     {
       title: "Spring Boot CRUD API",
       description: "Designed backend services using Spring Boot with layered architecture. Implemented RESTful APIs with JPA and Hibernate ORM for efficient data management.",
       technologies: ["Java", "Spring Boot", "JPA", "MySQL", "Hibernate"],
       link: null,
-      github: null
+      github: "https://github.com/Dhanshreeratneria/springboot-CURD-operation"
     }
   ];
 
@@ -498,7 +498,7 @@ const App = () => {
                   <Github className="w-5 h-5" />
                 </motion.a>
                 <motion.a
-                  href="https://linkedin.com/in/dhanshree-ratneria"
+                  href="https://www.linkedin.com/in/dhanshree-ratneria-94b0a625b/"
                   target="_blank"
                   whileHover={{ scale: 1.1, y: -3 }}
                   className="w-10 h-10 rounded-full bg-[#DBC2A6]/20 flex items-center justify-center text-[#414A37] hover:bg-[#99744A] hover:text-white transition-all duration-300"
@@ -821,7 +821,7 @@ const App = () => {
               <Github className="w-4 h-4" /> GitHub
             </motion.a>
             <motion.a 
-              href="https://linkedin.com/in/dhanshree-ratneria"
+              href="https://www.linkedin.com/in/dhanshree-ratneria-94b0a625b/"
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ y: -2, color: "#99744A" }}
