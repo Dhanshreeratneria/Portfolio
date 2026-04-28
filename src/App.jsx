@@ -5,13 +5,15 @@ import {
   animate, useScroll, useSpring, AnimatePresence, LayoutGroup
 } from 'framer-motion';
 import {
-  Github, Linkedin, Mail, MapPin, Phone, Code2, Zap, Shield,
+  Mail, MapPin, Phone, Code2, Zap, Shield,
   Briefcase, Trophy, Award, Rocket, Database, Globe, Server,
   Layout, Sparkles, ExternalLink, ChevronRight, Sprout, Cpu,
   Wrench, X, User, GraduationCap, Star, ShoppingCart,
   CalendarCheck, Package, Utensils, ClipboardList, ArrowUpRight,
   Terminal, Lock, Menu, ChevronDown
 } from 'lucide-react';
+import { GitHub, Linkedin } from "lucide-react";
+import { Analytics } from "@vercel/analytics/next"
 
 /* ─── Global Styles injected ────────────────────────────────────────────── */
 const GlobalStyles = () => (
