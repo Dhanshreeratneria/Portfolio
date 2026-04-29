@@ -1,5 +1,6 @@
 // App.jsx — Dhanshree Ratneria · Premium Portfolio
 import React, { useEffect, useRef, useState } from 'react';
+import mypic from './assets/mypic.jpg';
 import {
   Mail, MapPin, Phone, Code2, Zap, Shield,
   Briefcase, Trophy, Award, Rocket, Database, Globe, Server,
@@ -462,17 +463,17 @@ const Hero = ({ onContact }) => {
                   overflow: 'hidden', background: 'var(--warm)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}>
-                  {/* FIX 1: Use relative path that works with Vite; fallback to initials via onError */}
-                  <img
-                    src="./assets/mypic.jpg"
-                    alt="Dhanshree Ratneria"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={e => {
-                      e.currentTarget.style.display = 'none';
-                      const fallback = e.currentTarget.parentElement.querySelector('.avatar-fallback');
-                      if (fallback) fallback.style.display = 'flex';
-                    }}
-                  />
+                   {/* FIX 1: Import image for Vite bundling; fallback to initials via onError */}
+                   <img
+                     src={mypic}
+                     alt="Dhanshree Ratneria"
+                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                     onError={e => {
+                       e.currentTarget.style.display = 'none';
+                       const fallback = e.currentTarget.parentElement.querySelector('.avatar-fallback');
+                       if (fallback) fallback.style.display = 'flex';
+                     }}
+                   />
                   <div className="avatar-fallback" style={{
                     display: 'none', alignItems: 'center', justifyContent: 'center',
                     width: '100%', height: '100%'
