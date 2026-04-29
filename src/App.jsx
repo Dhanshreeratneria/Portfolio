@@ -1,21 +1,19 @@
 // App.jsx — Dhanshree Ratneria · Premium Portfolio
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import {
-  motion, useInView, useMotionValue, useTransform,
-  animate, useScroll, useSpring, AnimatePresence, LayoutGroup
-} from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Mail, MapPin, Phone, Code2, Zap, Shield,
   Briefcase, Trophy, Award, Rocket, Database, Globe, Server,
-  Layout, Sparkles, ExternalLink, ChevronRight, Sprout, Cpu,
+  Layout, Sparkles, ExternalLink, ChevronRight, Cpu,
   Wrench, X, User, GraduationCap, Star, ShoppingCart,
   CalendarCheck, Package, Utensils, ClipboardList, ArrowUpRight,
-  Terminal, Lock, Menu, ChevronDown
+  Terminal, Menu, ChevronDown, Github, Linkedin
 } from 'lucide-react';
-import { GitHub, Linkedin } from "lucide-react";
-import { Analytics } from "@vercel/analytics/next"
+import {
+  motion, useInView, useMotionValue, useTransform, animate,
+  useSpring, useScroll, AnimatePresence, LayoutGroup
+} from 'framer-motion';
 
-/* ─── Global Styles injected ────────────────────────────────────────────── */
+/* ─── Global Styles ──────────────────────────────────────────────────────── */
 const GlobalStyles = () => (
   <style>{`
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
@@ -55,15 +53,12 @@ const GlobalStyles = () => (
     .font-display { font-family: 'Cormorant Garamond', serif; }
     .font-mono    { font-family: 'DM Mono', monospace; }
 
-    /* Scrollbar */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: var(--cream); }
     ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
 
-    /* Selection */
     ::selection { background: var(--gold); color: var(--cream); }
 
-    /* Noise overlay */
     body::before {
       content: '';
       position: fixed;
@@ -74,7 +69,6 @@ const GlobalStyles = () => (
       opacity: 0.5;
     }
 
-    /* Grain on cards */
     .card-grain {
       position: relative;
       overflow: hidden;
@@ -88,7 +82,6 @@ const GlobalStyles = () => (
       border-radius: inherit;
     }
 
-    /* Gold shimmer line */
     .shimmer-line {
       background: linear-gradient(90deg, transparent, var(--gold), transparent);
       background-size: 200% 100%;
@@ -99,7 +92,6 @@ const GlobalStyles = () => (
       100% { background-position: 200% 0; }
     }
 
-    /* Glowing dot */
     .dot-pulse {
       animation: dotPulse 2s ease-in-out infinite;
     }
@@ -108,7 +100,6 @@ const GlobalStyles = () => (
       50% { opacity: 0.5; transform: scale(0.8); }
     }
 
-    /* Tag pill */
     .tag-pill {
       display: inline-flex;
       align-items: center;
@@ -129,18 +120,12 @@ const GlobalStyles = () => (
       color: var(--cream);
     }
 
-    /* Section label */
     .section-eyebrow {
       font-family: 'DM Mono', monospace;
       font-size: 11px;
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--gold);
-    }
-
-    /* Diagonal accent */
-    .diagonal-bg {
-      background: linear-gradient(135deg, var(--surface) 0%, var(--warm) 100%);
     }
   `}</style>
 );
@@ -156,7 +141,7 @@ const AnimatedCounter = ({ value, suffix = '', prefix = '', duration = 2 }) => {
   useEffect(() => {
     if (!isInView) return;
     const c = animate(count, value, { duration, ease: [0.25, 0.1, 0.25, 1] });
-    const u = rounded.onChange(v => setDisplay(v));
+    const u = rounded.on('change', v => setDisplay(v));
     return () => { c.stop(); u(); };
   }, [isInView]);
 
@@ -196,16 +181,12 @@ const TextSwap = () => {
 
 /* ─── Cursor glow ───────────────────────────────────────────────────────── */
 const CursorGlow = () => {
-  const [pos, setPos] = useState({ x: -200, y: -200 });
   const springConfig = { stiffness: 150, damping: 15 };
-  const x = useSpring(useMotionValue(pos.x), springConfig);
-  const y = useSpring(useMotionValue(pos.y), springConfig);
+  const x = useSpring(useMotionValue(-200), springConfig);
+  const y = useSpring(useMotionValue(-200), springConfig);
 
   useEffect(() => {
-    const h = e => {
-      x.set(e.clientX);
-      y.set(e.clientY);
-    };
+    const h = e => { x.set(e.clientX); y.set(e.clientY); };
     window.addEventListener('mousemove', h);
     return () => window.removeEventListener('mousemove', h);
   }, []);
@@ -248,7 +229,6 @@ const NAV_LINKS = [
 
 const Nav = ({ onContact }) => {
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 40);
@@ -271,14 +251,12 @@ const Nav = ({ onContact }) => {
       }}
     >
       <div style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 72 }}>
-        {/* Logo */}
         <motion.a href="#" whileHover={{ scale: 1.03 }} style={{ textDecoration: 'none' }}>
           <span className="font-display" style={{ fontSize: '1.75rem', fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.02em' }}>
             DR<span style={{ color: 'var(--gold)' }}>.</span>
           </span>
         </motion.a>
 
-        {/* Desktop links */}
         <div style={{ display: 'flex', gap: 40, alignItems: 'center' }} className="desktop-nav">
           {NAV_LINKS.map(l => (
             <motion.a
@@ -287,7 +265,7 @@ const Nav = ({ onContact }) => {
               style={{
                 textDecoration: 'none', color: 'var(--ink-80)',
                 fontSize: '0.8rem', letterSpacing: '0.06em', fontWeight: 500,
-                textTransform: 'uppercase', transition: 'color 0.2s, transform 0.2s'
+                textTransform: 'uppercase', transition: 'color 0.2s'
               }}
             >
               {l.label}
@@ -295,7 +273,6 @@ const Nav = ({ onContact }) => {
           ))}
         </div>
 
-        {/* CTA */}
         <motion.button
           onClick={onContact}
           whileHover={{ scale: 1.04, boxShadow: '0 8px 32px rgba(184,151,90,0.25)' }}
@@ -330,7 +307,6 @@ const Hero = ({ onContact }) => {
       padding: 'clamp(100px, 12vh, 140px) clamp(24px, 5vw, 80px) 80px',
       position: 'relative', overflow: 'hidden'
     }}>
-      {/* Background elements */}
       <div style={{
         position: 'absolute', top: '10%', right: '-5%', width: 600, height: 600,
         borderRadius: '50%', background: 'radial-gradient(circle, rgba(184,151,90,0.08) 0%, transparent 65%)',
@@ -341,7 +317,6 @@ const Hero = ({ onContact }) => {
         borderRadius: '50%', background: 'radial-gradient(circle, rgba(184,151,90,0.05) 0%, transparent 65%)',
         pointerEvents: 'none'
       }} />
-      {/* Grid lines */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
         backgroundImage: 'linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)',
@@ -349,19 +324,15 @@ const Hero = ({ onContact }) => {
       }} />
 
       <div style={{ maxWidth: 1280, margin: '0 auto', width: '100%', position: 'relative', zIndex: 1 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 60, alignItems: 'center' }}
-          className="hero-grid">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 60, alignItems: 'center' }} className="hero-grid">
 
-          {/* Left content */}
           <motion.div variants={stagger} initial="hidden" animate="show">
-            {/* Eyebrow */}
             <motion.div variants={item} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
               <motion.div style={{ width: 32, height: 1, background: 'var(--gold)' }} animate={{ scaleX: [0, 1] }} transition={{ duration: 0.8 }} />
               <span className="section-eyebrow">Portfolio · 2026</span>
               <div className="dot-pulse" style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--gold)' }} />
             </motion.div>
 
-            {/* Name */}
             <motion.h1 variants={item} className="font-display" style={{
               fontSize: 'clamp(3.25rem, 7vw, 5.75rem)', lineHeight: 1.0,
               fontWeight: 400, letterSpacing: '-0.02em', color: 'var(--ink)',
@@ -371,12 +342,10 @@ const Hero = ({ onContact }) => {
               <em style={{ color: 'var(--gold)', fontStyle: 'italic', fontWeight: 300 }}>Ratneria</em>
             </motion.h1>
 
-            {/* Role swap */}
             <motion.div variants={item} style={{ marginBottom: 28 }}>
               <TextSwap />
             </motion.div>
 
-            {/* Description */}
             <motion.p variants={item} style={{
               maxWidth: 520, fontSize: '1rem', lineHeight: 1.75,
               color: 'var(--ink-80)', marginBottom: 36, fontWeight: 300
@@ -386,7 +355,6 @@ const Hero = ({ onContact }) => {
               Currently pursuing B.Tech CSE at SVVV Indore — graduating July 2026.
             </motion.p>
 
-            {/* Contact row */}
             <motion.div variants={item} style={{ display: 'flex', flexWrap: 'wrap', gap: 20, marginBottom: 40, fontSize: '0.8rem', color: 'var(--ink-80)' }}>
               {[
                 { icon: MapPin, text: 'Indore, India' },
@@ -399,7 +367,7 @@ const Hero = ({ onContact }) => {
                   style={{
                     display: 'flex', alignItems: 'center', gap: 6,
                     textDecoration: 'none', color: 'inherit',
-                    transition: 'color 0.2s, transform 0.2s', fontFamily: 'DM Mono, monospace', fontSize: '0.75rem'
+                    transition: 'color 0.2s', fontFamily: 'DM Mono, monospace', fontSize: '0.75rem'
                   }}
                 >
                   <Icon size={13} style={{ color: 'var(--gold)' }} />
@@ -408,7 +376,6 @@ const Hero = ({ onContact }) => {
               ))}
             </motion.div>
 
-            {/* CTAs */}
             <motion.div variants={item} style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'center' }}>
               <motion.button
                 onClick={onContact}
@@ -465,14 +432,12 @@ const Hero = ({ onContact }) => {
             className="hero-avatar"
           >
             <div style={{ position: 'relative', width: 320, height: 320 }}>
-              {/* Outer rings */}
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
                 style={{
                   position: 'absolute', inset: -16, borderRadius: '50%',
-                  border: '1px solid var(--border-strong)',
-                  willChange: 'transform'
+                  border: '1px solid var(--border-strong)', willChange: 'transform'
                 }}
               />
               <motion.div
@@ -480,14 +445,12 @@ const Hero = ({ onContact }) => {
                 transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
                 style={{
                   position: 'absolute', inset: -4, borderRadius: '50%',
-                  border: '1px dashed rgba(184,151,90,0.25)',
-                  willChange: 'transform'
+                  border: '1px dashed rgba(184,151,90,0.25)', willChange: 'transform'
                 }}
               />
-              {/* Main circle */}
               <motion.div
                 whileHover={{ scale: 1.05, boxShadow: '0 20px 60px rgba(184,151,90,0.2)' }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                 style={{
                   width: 320, height: 320, borderRadius: '50%',
                   background: 'linear-gradient(145deg, var(--warm), var(--gold-lt))',
@@ -499,16 +462,18 @@ const Hero = ({ onContact }) => {
                   overflow: 'hidden', background: 'var(--warm)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}>
+                  {/* FIX 1: Use relative path that works with Vite; fallback to initials via onError */}
                   <img
-                    src="/src/assets/mypic.jpg"
+                    src="./assets/mypic.jpg"
                     alt="Dhanshree Ratneria"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     onError={e => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
+                      e.currentTarget.style.display = 'none';
+                      const fallback = e.currentTarget.parentElement.querySelector('.avatar-fallback');
+                      if (fallback) fallback.style.display = 'flex';
                     }}
                   />
-                  <div style={{
+                  <div className="avatar-fallback" style={{
                     display: 'none', alignItems: 'center', justifyContent: 'center',
                     width: '100%', height: '100%'
                   }}>
@@ -517,7 +482,6 @@ const Hero = ({ onContact }) => {
                 </div>
               </motion.div>
 
-              {/* Floating badges */}
               <motion.div
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -527,8 +491,7 @@ const Hero = ({ onContact }) => {
                   borderRadius: 100, padding: '0.5rem 1rem',
                   display: 'flex', alignItems: 'center', gap: 6,
                   fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
-                  willChange: 'transform'
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.15)', willChange: 'transform'
                 }}
               >
                 <Code2 size={12} style={{ color: 'var(--gold)' }} /> MERN Stack
@@ -543,8 +506,7 @@ const Hero = ({ onContact }) => {
                   color: 'var(--cream)', borderRadius: 100, padding: '0.5rem 1rem',
                   display: 'flex', alignItems: 'center', gap: 6,
                   fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em',
-                  boxShadow: '0 8px 32px rgba(184,151,90,0.3)',
-                  willChange: 'transform'
+                  boxShadow: '0 8px 32px rgba(184,151,90,0.3)', willChange: 'transform'
                 }}
               >
                 <Sparkles size={12} /> Spring Boot
@@ -558,8 +520,7 @@ const Hero = ({ onContact }) => {
                   background: 'var(--surface)', color: 'var(--ink)',
                   borderRadius: 12, padding: '0.625rem 0.875rem',
                   display: 'flex', flexDirection: 'column', alignItems: 'center',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
-                  border: '1px solid var(--border)',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.08)', border: '1px solid var(--border)',
                   willChange: 'transform'
                 }}
               >
@@ -571,7 +532,6 @@ const Hero = ({ onContact }) => {
         </div>
       </div>
 
-      {/* Scroll hint */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -590,7 +550,7 @@ const Hero = ({ onContact }) => {
 
       <style>{`
         .hero-grid { grid-template-columns: 1fr auto; }
-        @media(max-width: 900px) {
+        @media(max-width:900px) {
           .hero-grid { grid-template-columns: 1fr !important; }
           .hero-avatar { display: none !important; }
         }
@@ -614,8 +574,7 @@ const StatsStrip = () => {
   return (
     <section ref={ref} style={{
       padding: '60px clamp(24px, 5vw, 80px)',
-      background: 'var(--ink)',
-      position: 'relative', overflow: 'hidden'
+      background: 'var(--ink)', position: 'relative', overflow: 'hidden'
     }}>
       <div className="shimmer-line" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1 }} />
       <div style={{
@@ -627,7 +586,7 @@ const StatsStrip = () => {
             key={i}
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: i * 0.15, duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+            transition={{ delay: i * 0.15, duration: 0.6 }}
             style={{ textAlign: 'center' }}
           >
             <Icon size={20} style={{ color: 'var(--gold)', marginBottom: 12 }} />
@@ -660,7 +619,7 @@ const Experience = () => {
   ];
 
   const containerRef = useRef(null);
-  const isInView = useInView(containerRef, { once: true, margin: "-100px" });
+  const isInView = useInView(containerRef, { once: true, margin: '-100px' });
 
   return (
     <section id="experience" style={{ padding: '100px clamp(24px, 5vw, 80px)' }} ref={containerRef}>
@@ -692,7 +651,6 @@ const Experience = () => {
             position: 'relative', overflow: 'hidden'
           }}
         >
-          {/* Gold accent */}
           <div style={{
             position: 'absolute', top: 0, left: 56, right: 56, height: 2,
             background: 'linear-gradient(90deg, transparent, var(--gold), transparent)'
@@ -718,7 +676,7 @@ const Experience = () => {
                 </div>
               </div>
               <p style={{ fontSize: '0.8rem', color: 'rgba(247,243,238,0.5)', marginLeft: 52, fontFamily: 'DM Mono, monospace' }}>
-                Indore, Madhya Pradesh · 4 months 
+                Indore, Madhya Pradesh · 4 months
               </p>
             </div>
             <div style={{
@@ -856,19 +814,16 @@ const ProjectCard = ({ title, subtitle, description, tech, link, github, icon: I
       transition={{ duration: 0.6, delay: (index % 3) * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      whileHover={{ y: -8, transition: { type: "spring", stiffness: 300, damping: 25 } }}
+      whileHover={{ y: -8, transition: { type: 'spring', stiffness: 300, damping: 25 } }}
       className="card-grain"
       style={{
-        background: 'var(--surface)',
-        border: `1px solid var(--border)`,
+        background: 'var(--surface)', border: '1px solid var(--border)',
         borderRadius: 20, padding: '28px 28px 24px',
         boxShadow: '0 1px 12px rgba(0,0,0,0.04)',
         display: 'flex', flexDirection: 'column', cursor: 'pointer',
-        position: 'relative',
-        overflow: 'hidden'
+        position: 'relative', overflow: 'hidden'
       }}
     >
-      {/* Hover Glow Effect */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: hovered ? 1 : 0 }}
@@ -880,7 +835,6 @@ const ProjectCard = ({ title, subtitle, description, tech, link, github, icon: I
         }}
       />
 
-      {/* Top row */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
         <motion.div
           animate={{ backgroundColor: hovered ? accent + '25' : accent + '15', borderColor: hovered ? accent + '50' : accent + '25' }}
@@ -922,7 +876,6 @@ const ProjectCard = ({ title, subtitle, description, tech, link, github, icon: I
         </div>
       </div>
 
-      {/* Text */}
       <p style={{ fontSize: '0.7rem', fontFamily: 'DM Mono, monospace', color: accent, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>
         {subtitle}
       </p>
@@ -933,7 +886,6 @@ const ProjectCard = ({ title, subtitle, description, tech, link, github, icon: I
         {description}
       </p>
 
-      {/* Tags */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
         {tech.map(t => (
           <span key={t} className="tag-pill" style={{ fontSize: '0.625rem' }}>{t}</span>
@@ -967,11 +919,10 @@ const Projects = () => (
         </p>
       </motion.div>
 
-      <LayoutGroup>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }} className="projects-grid">
-          {PROJECTS.map((p, i) => <ProjectCard key={i} {...p} index={i} />)}
-        </div>
-      </LayoutGroup>
+      {/* FIX 2: Removed LayoutGroup wrapper — no layoutId on cards so it had no effect */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }} className="projects-grid">
+        {PROJECTS.map((p, i) => <ProjectCard key={i} {...p} index={i} />)}
+      </div>
     </div>
     <style>{`
       @media(max-width:1024px){ .projects-grid { grid-template-columns: repeat(2,1fr) !important; } }
@@ -981,6 +932,11 @@ const Projects = () => (
 );
 
 /* ─── Skills ────────────────────────────────────────────────────────────── */
+
+/* FIX 3: Replaced via.placeholder.com (unreliable) with a data URI fallback generator */
+const skillFallbackSrc = (letter) =>
+  `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23E8DDD0'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='14' font-family='sans-serif' fill='%238A6D3B'%3E${letter}%3C/text%3E%3C/svg%3E`;
+
 const SKILL_CATS = [
   {
     category: 'Languages', icon: Code2,
@@ -1051,7 +1007,6 @@ const SkillCard = ({ category, icon: Icon, skills, index }) => {
         transition: 'transform 0.3s, box-shadow 0.3s'
       }}
     >
-      {/* Header */}
       <div style={{
         padding: '20px 24px', borderBottom: '1px solid var(--border)',
         display: 'flex', alignItems: 'center', gap: 10,
@@ -1067,7 +1022,6 @@ const SkillCard = ({ category, icon: Icon, skills, index }) => {
         <span className="font-display" style={{ fontSize: '1.25rem', fontWeight: 500, color: 'var(--ink)' }}>{category}</span>
       </div>
 
-      {/* Skills list */}
       <div style={{ padding: '16px 24px 24px' }}>
         {skills.map((skill, i) => (
           <motion.div
@@ -1075,11 +1029,7 @@ const SkillCard = ({ category, icon: Icon, skills, index }) => {
             initial={{ opacity: 0, x: -10 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ delay: index * 0.05 + i * 0.05 }}
-            whileHover={{ 
-              backgroundColor: 'rgba(184,151,90,0.05)', 
-              paddingLeft: 20,
-              transition: { duration: 0.2 } 
-            }}
+            whileHover={{ backgroundColor: 'rgba(184,151,90,0.05)', paddingLeft: 20 }}
             style={{
               display: 'flex', alignItems: 'center', gap: 12,
               padding: '10px 12px', borderRadius: 10, marginBottom: 4,
@@ -1087,9 +1037,10 @@ const SkillCard = ({ category, icon: Icon, skills, index }) => {
             }}
           >
             <img
-              src={skill.img} alt={skill.name}
+              src={skill.img}
+              alt={skill.name}
               style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'contain', background: 'white', padding: 4, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', flexShrink: 0 }}
-              onError={e => { e.target.src = `https://via.placeholder.com/32/E8DDD0/8A6D3B?text=${skill.name[0]}`; }}
+              onError={e => { e.currentTarget.src = skillFallbackSrc(skill.name[0]); }}
             />
             <div>
               <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--ink)', lineHeight: 1.2 }}>{skill.name}</p>
@@ -1132,9 +1083,10 @@ const Skills = () => (
         {SKILL_CATS.map((cat, i) => <SkillCard key={i} {...cat} index={i} />)}
       </div>
     </div>
+    {/* FIX 4: Added missing quotes around 1fr in media query */}
     <style>{`
       @media(max-width:900px){ .skills-grid { grid-template-columns: repeat(2,1fr) !important; } }
-      @media(max-width:560px){ .skills-grid { gridTemplateColumns: 1fr !important; } }
+      @media(max-width:560px){ .skills-grid { grid-template-columns: 1fr !important; } }
     `}</style>
   </section>
 );
@@ -1167,9 +1119,7 @@ const Achievements = () => (
       </motion.div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }} className="ach-grid">
-        {/* Achievements + Education */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {/* Achievements */}
           <motion.div
             initial={{ opacity: 0, x: -24 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -1183,10 +1133,10 @@ const Achievements = () => (
             <div style={{ position: 'absolute', top: 0, left: 32, right: 32, height: 2, background: 'linear-gradient(90deg, transparent, var(--gold), transparent)' }} />
             <p style={{ fontSize: '0.7rem', fontFamily: 'DM Mono, monospace', color: 'var(--gold)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 20 }}>Notable Wins</p>
             {ACHIEVEMENTS.map(({ text, icon: Icon }, i) => (
-              <motion.div key={i} 
-                initial={{ opacity: 0, x: -16 }} 
-                whileInView={{ opacity: 1, x: 0 }} 
-                viewport={{ once: true }} 
+              <motion.div key={i}
+                initial={{ opacity: 0, x: -16 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
                 transition={{ delay: i * 0.12 }}
                 whileHover={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
                 style={{ display: 'flex', gap: 14, marginBottom: i < ACHIEVEMENTS.length - 1 ? 20 : 0, paddingBottom: i < ACHIEVEMENTS.length - 1 ? 20 : 0, borderBottom: i < ACHIEVEMENTS.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
@@ -1198,7 +1148,6 @@ const Achievements = () => (
             ))}
           </motion.div>
 
-          {/* Education */}
           <motion.div
             initial={{ opacity: 0, x: -24 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -1229,7 +1178,6 @@ const Achievements = () => (
           </motion.div>
         </div>
 
-        {/* Certifications */}
         <motion.div
           initial={{ opacity: 0, x: 24 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -1277,8 +1225,8 @@ const Achievements = () => (
 );
 
 /* ─── Contact Modal ─────────────────────────────────────────────────────── */
-const Heart = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 18, height: 18 }}>
+const Heart = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 18, height: 18 }}>
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
   </svg>
 );
@@ -1294,131 +1242,126 @@ const CONTACT_DETAILS = [
   { icon: Star, label: 'CGPA', value: '7.72 / 10.0' },
 ];
 
+/* FIX 5: Removed the inner AnimatePresence wrapper — the outer one in App handles exit animation */
 const ContactModal = ({ onClose }) => (
-  <AnimatePresence>
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    style={{
+      position: 'fixed', inset: 0, zIndex: 200,
+      background: 'rgba(13,13,13,0.7)', backdropFilter: 'blur(12px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '24px', overflowY: 'auto'
+    }}
+    onClick={e => e.target === e.currentTarget && onClose()}
+  >
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      initial={{ opacity: 0, y: 40, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 40, scale: 0.95 }}
+      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+      className="card-grain"
       style={{
-        position: 'fixed', inset: 0, zIndex: 200,
-        background: 'rgba(13,13,13,0.7)', backdropFilter: 'blur(12px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '24px', overflowY: 'auto'
+        background: 'var(--cream)', borderRadius: 28, width: '100%', maxWidth: 720,
+        border: '1px solid var(--border-strong)', overflow: 'hidden',
+        maxHeight: '90vh', overflowY: 'auto'
       }}
-      onClick={e => e.target === e.currentTarget && onClose()}
     >
-      <motion.div
-        initial={{ opacity: 0, y: 40, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 40, scale: 0.95 }}
-        transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-        className="card-grain"
-        style={{
-          background: 'var(--cream)', borderRadius: 28, width: '100%', maxWidth: 720,
-          border: '1px solid var(--border-strong)', overflow: 'hidden',
-          maxHeight: '90vh', overflowY: 'auto'
-        }}
-      >
-        {/* Modal header */}
+      <div style={{
+        padding: '32px 40px 28px', borderBottom: '1px solid var(--border)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: 'var(--ink)', position: 'sticky', top: 0, zIndex: 1
+      }}>
+        <div>
+          <p className="section-eyebrow" style={{ marginBottom: 4, color: 'var(--gold-lt)' }}>Let's Connect</p>
+          <h2 className="font-display" style={{ fontSize: '2rem', fontWeight: 400, color: 'var(--cream)', letterSpacing: '-0.02em' }}>
+            Contact &amp; Details
+          </h2>
+        </div>
+        <motion.button
+          onClick={onClose}
+          whileHover={{ scale: 1.1, rotate: 90, background: 'var(--gold)' }}
+          style={{
+            width: 40, height: 40, borderRadius: '50%',
+            background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', color: 'var(--cream)', transition: 'all 0.2s'
+          }}
+        >
+          <X size={16} />
+        </motion.button>
+      </div>
+
+      <div style={{ padding: '32px 40px 40px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 28 }}>
+          {CONTACT_DETAILS.map((d, i) => {
+            const Icon = d.icon;
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.06 }}
+                whileHover={{ scale: 1.02, boxShadow: '0 8px 20px rgba(0,0,0,0.05)' }}
+                style={{
+                  background: 'var(--surface)', borderRadius: 14,
+                  padding: '16px 18px', border: '1px solid var(--border)'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <Icon size={13} style={{ color: 'var(--gold)' }} />
+                  <span style={{ fontSize: '0.625rem', fontFamily: 'DM Mono, monospace', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-40)' }}>{d.label}</span>
+                </div>
+                {d.link ? (
+                  <a href={d.link} target="_blank" rel="noopener noreferrer"
+                    style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--ink)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ wordBreak: 'break-all' }}>{d.value}</span>
+                    <ExternalLink size={10} style={{ color: 'var(--gold)', flexShrink: 0 }} />
+                  </a>
+                ) : (
+                  <p style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--ink)' }}>{d.value}</p>
+                )}
+              </motion.div>
+            );
+          })}
+        </div>
+
         <div style={{
-          padding: '32px 40px 28px', borderBottom: '1px solid var(--border)',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          background: 'var(--ink)', position: 'sticky', top: 0, zIndex: 1
+          background: 'var(--ink)', borderRadius: 16, padding: '28px 32px',
+          marginBottom: 16, position: 'relative', overflow: 'hidden'
         }}>
-          <div>
-            <p className="section-eyebrow" style={{ marginBottom: 4, color: 'var(--gold-lt)' }}>Let's Connect</p>
-            <h2 className="font-display" style={{ fontSize: '2rem', fontWeight: 400, color: 'var(--cream)', letterSpacing: '-0.02em' }}>
-              Contact &amp; Details
-            </h2>
-          </div>
-          <motion.button
-            onClick={onClose}
-            whileHover={{ scale: 1.1, rotate: 90, background: 'var(--gold)' }}
-            style={{
-              width: 40, height: 40, borderRadius: '50%',
-              background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', color: 'var(--cream)', transition: 'all 0.2s'
-            }}
-          >
-            <X size={16} />
-          </motion.button>
-        </div>
-
-        <div style={{ padding: '32px 40px 40px' }}>
-          {/* Detail grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 28 }}>
-            {CONTACT_DETAILS.map((d, i) => {
-              const Icon = d.icon;
-              return (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.06 }}
-                  whileHover={{ scale: 1.02, boxShadow: '0 8px 20px rgba(0,0,0,0.05)' }}
-                  style={{
-                    background: 'var(--surface)', borderRadius: 14,
-                    padding: '16px 18px', border: '1px solid var(--border)'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                    <Icon size={13} style={{ color: 'var(--gold)' }} />
-                    <span style={{ fontSize: '0.625rem', fontFamily: 'DM Mono, monospace', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-40)' }}>{d.label}</span>
-                  </div>
-                  {d.link ? (
-                    <a href={d.link} target="_blank" rel="noopener noreferrer"
-                      style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--ink)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <span style={{ wordBreak: 'break-all' }}>{d.value}</span>
-                      <ExternalLink size={10} style={{ color: 'var(--gold)', flexShrink: 0 }} />
-                    </a>
-                  ) : (
-                    <p style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--ink)' }}>{d.value}</p>
-                  )}
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* About */}
-          <div style={{
-            background: 'var(--ink)', borderRadius: 16, padding: '28px 32px',
-            marginBottom: 16, position: 'relative', overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, left: 40, right: 40, height: 1, background: 'linear-gradient(90deg, transparent, var(--gold), transparent)' }} />
-            <h3 className="font-display" style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--cream)', marginBottom: 12 }}>About Me</h3>
-            <p style={{ fontSize: '0.875rem', color: 'rgba(247,243,238,0.7)', lineHeight: 1.75, marginBottom: 16, fontWeight: 300 }}>
-              Full Stack Developer with hands-on experience in MERN stack and Spring Boot. Building scalable web applications
-              and high-performance RESTful APIs. Skilled in authentication (JWT, RBAC), database optimization, and responsive
-              UI development. Passionate about clean architecture and production-ready solutions in Agile environments.
-            </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {['MERN Stack', 'Spring Boot', 'JWT/RBAC', 'REST APIs', 'Agile', 'MongoDB', 'React.js'].map(tag => (
-                <span key={tag} className="tag-pill" style={{ background: 'rgba(184,151,90,0.15)', borderColor: 'rgba(184,151,90,0.3)', color: 'var(--gold-lt)' }}>{tag}</span>
-              ))}
-            </div>
-          </div>
-
-          {/* Extracurricular */}
-          <div style={{
-            background: 'var(--surface)', borderRadius: 14, padding: '20px 24px',
-            border: '1px solid var(--border)', display: 'flex', alignItems: 'flex-start', gap: 12
-          }}>
-            <Heart style={{ color: 'var(--gold)', flexShrink: 0, marginTop: 2 }} />
-            <div>
-              <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--ink)' }}>Indore Cancer Foundation Club (2022–2025)</p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--ink-80)', marginTop: 4, fontWeight: 300 }}>Led awareness campaigns and designed promotional materials.</p>
-            </div>
-          </div>
-
-          <p style={{ textAlign: 'center', fontSize: '0.7rem', color: 'var(--ink-40)', marginTop: 20, fontFamily: 'DM Mono, monospace', letterSpacing: '0.08em' }}>
-            Languages: English · Hindi
+          <div style={{ position: 'absolute', top: 0, left: 40, right: 40, height: 1, background: 'linear-gradient(90deg, transparent, var(--gold), transparent)' }} />
+          <h3 className="font-display" style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--cream)', marginBottom: 12 }}>About Me</h3>
+          <p style={{ fontSize: '0.875rem', color: 'rgba(247,243,238,0.7)', lineHeight: 1.75, marginBottom: 16, fontWeight: 300 }}>
+            Full Stack Developer with hands-on experience in MERN stack and Spring Boot. Building scalable web applications
+            and high-performance RESTful APIs. Skilled in authentication (JWT, RBAC), database optimization, and responsive
+            UI development. Passionate about clean architecture and production-ready solutions in Agile environments.
           </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {['MERN Stack', 'Spring Boot', 'JWT/RBAC', 'REST APIs', 'Agile', 'MongoDB', 'React.js'].map(tag => (
+              <span key={tag} className="tag-pill" style={{ background: 'rgba(184,151,90,0.15)', borderColor: 'rgba(184,151,90,0.3)', color: 'var(--gold-lt)' }}>{tag}</span>
+            ))}
+          </div>
         </div>
-      </motion.div>
+
+        <div style={{
+          background: 'var(--surface)', borderRadius: 14, padding: '20px 24px',
+          border: '1px solid var(--border)', display: 'flex', alignItems: 'flex-start', gap: 12
+        }}>
+          <span style={{ color: 'var(--gold)', flexShrink: 0, marginTop: 2 }}><Heart /></span>
+          <div>
+            <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--ink)' }}>Indore Cancer Foundation Club (2022–2025)</p>
+            <p style={{ fontSize: '0.8rem', color: 'var(--ink-80)', marginTop: 4, fontWeight: 300 }}>Led awareness campaigns and designed promotional materials.</p>
+          </div>
+        </div>
+
+        <p style={{ textAlign: 'center', fontSize: '0.7rem', color: 'var(--ink-40)', marginTop: 20, fontFamily: 'DM Mono, monospace', letterSpacing: '0.08em' }}>
+          Languages: English · Hindi
+        </p>
+      </div>
     </motion.div>
-  </AnimatePresence>
+  </motion.div>
 );
 
 /* ─── Footer ────────────────────────────────────────────────────────────── */
@@ -1427,11 +1370,7 @@ const Footer = ({ onContact }) => (
     <div className="shimmer-line" style={{ marginBottom: 48, height: 1 }} />
     <div style={{ maxWidth: 1280, margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 32, marginBottom: 40 }}>
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-        >
+        <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
           <span className="font-display" style={{ fontSize: '3.25rem', fontWeight: 400, color: 'var(--cream)', letterSpacing: '-0.02em', lineHeight: 1 }}>
             DR<span style={{ color: 'var(--gold)' }}>.</span>
           </span>
@@ -1490,8 +1429,7 @@ export default function App() {
   const [showContact, setShowContact] = useState(false);
 
   useEffect(() => {
-    if (showContact) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = '';
+    document.body.style.overflow = showContact ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [showContact]);
 
@@ -1510,6 +1448,7 @@ export default function App() {
         <Achievements />
       </main>
       <Footer onContact={() => setShowContact(true)} />
+      {/* FIX 5: Single AnimatePresence here is correct — ContactModal handles its own enter/exit */}
       <AnimatePresence>
         {showContact && <ContactModal onClose={() => setShowContact(false)} />}
       </AnimatePresence>
