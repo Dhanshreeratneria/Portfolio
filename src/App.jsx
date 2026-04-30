@@ -4,14 +4,14 @@ import mypic from './assets/mypic.jpg';
 import {
   Mail, MapPin, Phone, Code2, Zap, Shield,
   Briefcase, Trophy, Award, Rocket, Database, Globe, Server,
-  Layout, Sparkles, ExternalLink, ChevronRight, Cpu,
+  Layout, Sparkles, ExternalLink, Cpu,
   Wrench, X, User, GraduationCap, Star, ShoppingCart,
   CalendarCheck, Package, Utensils, ClipboardList, ArrowUpRight,
   Terminal, Menu, ChevronDown, Github, Linkedin
 } from 'lucide-react';
 import {
   motion, useInView, useMotionValue, useTransform, animate,
-  useSpring, useScroll, AnimatePresence, LayoutGroup
+  useSpring, useScroll, AnimatePresence
 } from 'framer-motion';
 
 /* ─── Global Styles ──────────────────────────────────────────────────────── */
@@ -180,7 +180,7 @@ const TextSwap = () => {
   );
 };
 
-/* ─── Cursor glow ───────────────────────────────────────────────────────── */
+/* ─── Cursor Glow ───────────────────────────────────────────────────────── */
 const CursorGlow = () => {
   const springConfig = { stiffness: 150, damping: 15 };
   const x = useSpring(useMotionValue(-200), springConfig);
@@ -230,6 +230,7 @@ const NAV_LINKS = [
 
 const Nav = ({ onContact }) => {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 40);
@@ -274,7 +275,17 @@ const Nav = ({ onContact }) => {
           ))}
         </div>
 
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: 8, color: 'var(--ink)' }}
+          className="mobile-menu-btn"
+          aria-label="Toggle menu"
+        >
+          <Menu size={24} />
+        </button>
+
         <motion.button
+          className="desktop-contact"
           onClick={onContact}
           whileHover={{ scale: 1.04, boxShadow: '0 8px 32px rgba(184,151,90,0.25)' }}
           whileTap={{ scale: 0.97 }}
@@ -289,7 +300,62 @@ const Nav = ({ onContact }) => {
           <Mail size={14} /> Contact
         </motion.button>
       </div>
-      <style>{`@media(max-width:768px){.desktop-nav{display:none!important}}`}</style>
+
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            key="mobile-menu"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            style={{
+              position: 'absolute', top: '100%', left: 0, right: 0,
+              background: 'var(--cream)', borderBottom: '1px solid var(--border)',
+              padding: '24px', display: 'flex', flexDirection: 'column',
+              gap: 16, boxShadow: '0 12px 32px rgba(0,0,0,0.08)'
+            }}
+          >
+            {NAV_LINKS.map(l => (
+              <motion.a
+                key={l.href} href={l.href}
+                onClick={() => setMobileOpen(false)}
+                whileHover={{ color: 'var(--gold)', x: 4 }}
+                style={{
+                  textDecoration: 'none', color: 'var(--ink-80)',
+                  fontSize: '1rem', fontWeight: 500,
+                  padding: '8px 0', borderBottom: '1px solid var(--border)'
+                }}
+              >
+                {l.label}
+              </motion.a>
+            ))}
+            <motion.button
+              onClick={() => { setMobileOpen(false); onContact(); }}
+              whileHover={{ scale: 1.02 }}
+              style={{
+                background: 'var(--ink)', color: 'var(--cream)', border: 'none',
+                borderRadius: 100, padding: '0.875rem 1.5rem', fontSize: '0.9rem',
+                fontWeight: 600, textTransform: 'uppercase', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: 8, marginTop: 8
+              }}
+            >
+              <Mail size={16} /> Get in Touch
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <style>{`
+        @media(max-width:768px){
+          .desktop-nav { display: none !important; }
+          .mobile-menu-btn { display: flex !important; }
+          .desktop-contact { display: none !important; }
+        }
+        @media(min-width:769px){
+          .mobile-menu-btn { display: none !important; }
+        }
+      `}</style>
     </motion.nav>
   );
 };
@@ -305,9 +371,10 @@ const Hero = ({ onContact }) => {
   return (
     <section style={{
       minHeight: '100vh', display: 'flex', alignItems: 'center',
-      padding: 'clamp(100px, 12vh, 140px) clamp(24px, 5vw, 80px) 80px',
+      padding: 'clamp(80px, 10vh, 120px) clamp(16px, 4vw, 80px) 60px',
       position: 'relative', overflow: 'hidden'
     }}>
+      {/* Background orbs */}
       <div style={{
         position: 'absolute', top: '10%', right: '-5%', width: 600, height: 600,
         borderRadius: '50%', background: 'radial-gradient(circle, rgba(184,151,90,0.08) 0%, transparent 65%)',
@@ -318,6 +385,7 @@ const Hero = ({ onContact }) => {
         borderRadius: '50%', background: 'radial-gradient(circle, rgba(184,151,90,0.05) 0%, transparent 65%)',
         pointerEvents: 'none'
       }} />
+      {/* Grid overlay */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
         backgroundImage: 'linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)',
@@ -325,8 +393,11 @@ const Hero = ({ onContact }) => {
       }} />
 
       <div style={{ maxWidth: 1280, margin: '0 auto', width: '100%', position: 'relative', zIndex: 1 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 60, alignItems: 'center' }} className="hero-grid">
 
+        {/* ── HERO GRID: text LEFT, avatar RIGHT ── */}
+        <div className="hero-grid">
+
+          {/* LEFT — Text content (first in DOM = left on desktop, top on mobile) */}
           <motion.div variants={stagger} initial="hidden" animate="show">
             <motion.div variants={item} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
               <motion.div style={{ width: 32, height: 1, background: 'var(--gold)' }} animate={{ scaleX: [0, 1] }} transition={{ duration: 0.8 }} />
@@ -424,7 +495,7 @@ const Hero = ({ onContact }) => {
             </motion.div>
           </motion.div>
 
-          {/* Right — Profile visual */}
+          {/* RIGHT — Avatar (second in DOM = right on desktop, below text on mobile) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -432,12 +503,17 @@ const Hero = ({ onContact }) => {
             style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
             className="hero-avatar"
           >
-            <div style={{ position: 'relative', width: 320, height: 320 }}>
+            <div style={{
+              position: 'relative',
+              width: 'clamp(200px, 28vw, 320px)',
+              height: 'clamp(200px, 28vw, 320px)'
+            }}>
+              {/* Rotating rings */}
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
                 style={{
-                  position: 'absolute', inset: -16, borderRadius: '50%',
+                  position: 'absolute', inset: '-5%', borderRadius: '50%',
                   border: '1px solid var(--border-strong)', willChange: 'transform'
                 }}
               />
@@ -445,15 +521,17 @@ const Hero = ({ onContact }) => {
                 animate={{ rotate: -360 }}
                 transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
                 style={{
-                  position: 'absolute', inset: -4, borderRadius: '50%',
+                  position: 'absolute', inset: '-2%', borderRadius: '50%',
                   border: '1px dashed rgba(184,151,90,0.25)', willChange: 'transform'
                 }}
               />
+
+              {/* Photo */}
               <motion.div
                 whileHover={{ scale: 1.05, boxShadow: '0 20px 60px rgba(184,151,90,0.2)' }}
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                 style={{
-                  width: 320, height: 320, borderRadius: '50%',
+                  width: '100%', height: '100%', borderRadius: '50%',
                   background: 'linear-gradient(145deg, var(--warm), var(--gold-lt))',
                   padding: 4, overflow: 'hidden', cursor: 'pointer'
                 }}
@@ -463,83 +541,90 @@ const Hero = ({ onContact }) => {
                   overflow: 'hidden', background: 'var(--warm)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}>
-                   {/* FIX 1: Import image for Vite bundling; fallback to initials via onError */}
-                   <img
-                     src={mypic}
-                     alt="Dhanshree Ratneria"
-                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                     onError={e => {
-                       e.currentTarget.style.display = 'none';
-                       const fallback = e.currentTarget.parentElement.querySelector('.avatar-fallback');
-                       if (fallback) fallback.style.display = 'flex';
-                     }}
-                   />
+                  <img
+                    src={mypic}
+                    alt="Dhanshree Ratneria"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={e => {
+                      e.currentTarget.style.display = 'none';
+                      const fallback = e.currentTarget.parentElement.querySelector('.avatar-fallback');
+                      if (fallback) fallback.style.display = 'flex';
+                    }}
+                  />
                   <div className="avatar-fallback" style={{
                     display: 'none', alignItems: 'center', justifyContent: 'center',
                     width: '100%', height: '100%'
                   }}>
-                    <span className="font-display" style={{ fontSize: '4.5rem', color: 'var(--gold-dk)', opacity: 0.5 }}>DR</span>
+                    <span className="font-display" style={{ fontSize: 'clamp(3rem, 10vw, 4.5rem)', color: 'var(--gold-dk)', opacity: 0.5 }}>DR</span>
                   </div>
                 </div>
               </motion.div>
 
+              {/* Badge — MERN */}
               <motion.div
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
                 style={{
-                  position: 'absolute', top: -8, right: -12,
+                  position: 'absolute', top: '-10px', right: '-16px',
                   background: 'var(--ink)', color: 'var(--cream)',
-                  borderRadius: 100, padding: '0.5rem 1rem',
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.15)', willChange: 'transform'
+                  borderRadius: 100, padding: '0.45rem 1rem',
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.05em',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.15)', willChange: 'transform', whiteSpace: 'nowrap'
                 }}
+                className="avatar-badge"
               >
-                <Code2 size={12} style={{ color: 'var(--gold)' }} /> MERN Stack
+                <Code2 size={12} style={{ color: 'var(--gold)' }} /> MERN
               </motion.div>
 
+              {/* Badge — Spring Boot */}
               <motion.div
                 animate={{ y: [0, 8, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
                 style={{
-                  position: 'absolute', bottom: 8, left: -20,
+                  position: 'absolute', bottom: '10px', left: '-24px',
                   background: 'linear-gradient(135deg, var(--gold-dk), var(--gold))',
-                  color: 'var(--cream)', borderRadius: 100, padding: '0.5rem 1rem',
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em',
-                  boxShadow: '0 8px 32px rgba(184,151,90,0.3)', willChange: 'transform'
+                  color: 'var(--cream)', borderRadius: 100, padding: '0.45rem 1rem',
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.05em',
+                  boxShadow: '0 8px 32px rgba(184,151,90,0.3)', willChange: 'transform', whiteSpace: 'nowrap'
                 }}
+                className="avatar-badge"
               >
                 <Sparkles size={12} /> Spring Boot
               </motion.div>
 
+              {/* Badge — Projects count */}
               <motion.div
-                animate={{ x: [0, -6, 0] }}
+                animate={{ x: [0, -5, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
                 style={{
-                  position: 'absolute', bottom: '38%', right: -40,
+                  position: 'absolute', bottom: '38%', right: '-48px',
                   background: 'var(--surface)', color: 'var(--ink)',
-                  borderRadius: 12, padding: '0.625rem 0.875rem',
+                  borderRadius: 12, padding: '0.6rem 0.9rem',
                   display: 'flex', flexDirection: 'column', alignItems: 'center',
                   boxShadow: '0 8px 32px rgba(0,0,0,0.08)', border: '1px solid var(--border)',
                   willChange: 'transform'
                 }}
+                className="avatar-badge"
               >
                 <span className="font-display" style={{ fontSize: '1.375rem', fontWeight: 600, color: 'var(--gold)', lineHeight: 1 }}>9+</span>
-                <span style={{ fontSize: '0.625rem', color: 'var(--ink-80)', letterSpacing: '0.05em', marginTop: 2 }}>Projects</span>
+                <span style={{ fontSize: '0.6rem', color: 'var(--ink-80)', letterSpacing: '0.05em', marginTop: 2 }}>Projects</span>
               </motion.div>
             </div>
           </motion.div>
-        </div>
+
+        </div>{/* end hero-grid */}
       </div>
 
+      {/* Scroll hint */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5 }}
         style={{
           position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0,
           color: 'var(--ink-40)', fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase'
         }}
       >
@@ -550,17 +635,48 @@ const Hero = ({ onContact }) => {
       </motion.div>
 
       <style>{`
-        .hero-grid { grid-template-columns: 1fr auto; }
-        @media(max-width:900px) {
-          .hero-grid { grid-template-columns: 1fr !important; }
-          .hero-avatar { display: none !important; }
+        /* Desktop: text left, avatar right */
+        .hero-grid {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 72px;
+          align-items: center;
+        }
+
+        /* Tablet: stack vertically, avatar below text */
+        @media(max-width:1024px) {
+          .hero-grid {
+            grid-template-columns: 1fr !important;
+            gap: 48px !important;
+            justify-items: center;
+          }
+          .hero-avatar {
+            order: 2 !important;
+          }
+        }
+
+        /* Mobile adjustments */
+        @media(max-width:768px) {
+          .hero-grid { gap: 36px !important; }
+          .hero-avatar > div {
+            width: clamp(160px, 50vw, 240px) !important;
+            height: clamp(160px, 50vw, 240px) !important;
+          }
+        }
+        @media(max-width:480px) {
+          .hero-grid { gap: 24px !important; }
+          .hero-avatar > div {
+            width: clamp(140px, 55vw, 200px) !important;
+            height: clamp(140px, 55vw, 200px) !important;
+          }
+          .avatar-badge { display: none !important; }
         }
       `}</style>
     </section>
   );
 };
 
-/* ─── Stats strip ───────────────────────────────────────────────────────── */
+/* ─── Stats Strip ───────────────────────────────────────────────────────── */
 const STATS = [
   { value: 9, suffix: '+', label: 'Projects Shipped', icon: Rocket },
   { value: 100, suffix: '+', label: 'APIs Built', icon: Zap },
@@ -578,10 +694,7 @@ const StatsStrip = () => {
       background: 'var(--ink)', position: 'relative', overflow: 'hidden'
     }}>
       <div className="shimmer-line" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1 }} />
-      <div style={{
-        maxWidth: 1280, margin: '0 auto',
-        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 40
-      }} className="stats-grid">
+      <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 40 }} className="stats-grid">
         {STATS.map(({ value, suffix, label, icon: Icon }, i) => (
           <motion.div
             key={i}
@@ -591,10 +704,7 @@ const StatsStrip = () => {
             style={{ textAlign: 'center' }}
           >
             <Icon size={20} style={{ color: 'var(--gold)', marginBottom: 12 }} />
-            <div className="font-display" style={{
-              fontSize: '3.25rem', fontWeight: 500, color: 'var(--cream)',
-              lineHeight: 1, letterSpacing: '-0.02em'
-            }}>
+            <div className="font-display" style={{ fontSize: '3.25rem', fontWeight: 500, color: 'var(--cream)', lineHeight: 1, letterSpacing: '-0.02em' }}>
               <AnimatedCounter value={value} suffix={suffix} />
             </div>
             <p style={{ fontSize: '0.75rem', color: 'rgba(247,243,238,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 8 }}>
@@ -604,7 +714,10 @@ const StatsStrip = () => {
         ))}
       </div>
       <div className="shimmer-line" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1 }} />
-      <style>{`@media(max-width:768px){ .stats-grid { grid-template-columns: repeat(2,1fr) !important; } }`}</style>
+      <style>{`
+        @media(max-width:768px){ .stats-grid { grid-template-columns: repeat(2,1fr) !important; } }
+        @media(max-width:480px){ .stats-grid { grid-template-columns: 1fr !important; } }
+      `}</style>
     </section>
   );
 };
@@ -632,10 +745,7 @@ const Experience = () => {
           style={{ marginBottom: 56 }}
         >
           <span className="section-eyebrow">Career</span>
-          <h2 className="font-display" style={{
-            fontSize: 'clamp(2.25rem, 4vw, 3.5rem)', fontWeight: 400,
-            marginTop: 8, letterSpacing: '-0.02em', color: 'var(--ink)'
-          }}>
+          <h2 className="font-display" style={{ fontSize: 'clamp(2.25rem, 4vw, 3.5rem)', fontWeight: 400, marginTop: 8, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
             Professional<br /><em style={{ color: 'var(--gold)', fontStyle: 'italic', fontWeight: 300 }}>Experience</em>
           </h2>
         </motion.div>
@@ -652,40 +762,22 @@ const Experience = () => {
             position: 'relative', overflow: 'hidden'
           }}
         >
-          <div style={{
-            position: 'absolute', top: 0, left: 56, right: 56, height: 2,
-            background: 'linear-gradient(90deg, transparent, var(--gold), transparent)'
-          }} />
+          <div style={{ position: 'absolute', top: 0, left: 56, right: 56, height: 2, background: 'linear-gradient(90deg, transparent, var(--gold), transparent)' }} />
 
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 36 }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                <div style={{
-                  width: 40, height: 40, borderRadius: 12,
-                  background: 'linear-gradient(135deg, var(--gold-dk), var(--gold))',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}>
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, var(--gold-dk), var(--gold))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Briefcase size={18} style={{ color: 'var(--cream)' }} />
                 </div>
                 <div>
-                  <p style={{ fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--gold)', fontFamily: 'DM Mono, monospace' }}>
-                    Full Stack Developer
-                  </p>
-                  <h3 className="font-display" style={{ fontSize: '1.75rem', fontWeight: 500, color: 'var(--cream)', letterSpacing: '-0.01em' }}>
-                    Acore IT Hub Pvt. Ltd.
-                  </h3>
+                  <p style={{ fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--gold)', fontFamily: 'DM Mono, monospace' }}>Full Stack Developer</p>
+                  <h3 className="font-display" style={{ fontSize: '1.75rem', fontWeight: 500, color: 'var(--cream)', letterSpacing: '-0.01em' }}>Acore IT Hub Pvt. Ltd.</h3>
                 </div>
               </div>
-              <p style={{ fontSize: '0.8rem', color: 'rgba(247,243,238,0.5)', marginLeft: 52, fontFamily: 'DM Mono, monospace' }}>
-                Indore, Madhya Pradesh · 4 months
-              </p>
+              <p style={{ fontSize: '0.8rem', color: 'rgba(247,243,238,0.5)', marginLeft: 52, fontFamily: 'DM Mono, monospace' }}>Indore, Madhya Pradesh · 4 months</p>
             </div>
-            <div style={{
-              padding: '6px 16px', borderRadius: 100,
-              border: '1px solid rgba(184,151,90,0.35)',
-              fontSize: '0.75rem', color: 'var(--gold)', fontFamily: 'DM Mono, monospace',
-              letterSpacing: '0.06em'
-            }}>
+            <div style={{ padding: '6px 16px', borderRadius: 100, border: '1px solid rgba(184,151,90,0.35)', fontSize: '0.75rem', color: 'var(--gold)', fontFamily: 'DM Mono, monospace', letterSpacing: '0.06em' }}>
               2024 – 2025
             </div>
           </div>
@@ -701,8 +793,7 @@ const Experience = () => {
                 style={{
                   display: 'flex', alignItems: 'flex-start', gap: 12,
                   padding: '14px 16px', borderRadius: 12,
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.06)',
+                  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
                   transition: 'transform 0.2s, background-color 0.2s'
                 }}
               >
@@ -721,84 +812,57 @@ const Experience = () => {
 /* ─── Projects ──────────────────────────────────────────────────────────── */
 const PROJECTS = [
   {
-    title: 'Tickvia',
-    subtitle: 'Event Ticket Booking Platform',
+    title: 'Tickvia', subtitle: 'Event Ticket Booking Platform',
     description: 'Scalable full-stack event booking platform supporting 100+ active listings. JWT authentication, protected routing, RESTful APIs for event lifecycle. 25% frontend efficiency gain via Redux optimization.',
     tech: ['React.js', 'Redux Toolkit', 'REST APIs', 'JWT Auth', 'Bootstrap'],
-    link: 'https://tickvia.com/',
-    icon: CalendarCheck,
-    accent: '#5B8FD4'
+    link: 'https://tickvia.com/', icon: CalendarCheck, accent: '#5B8FD4'
   },
   {
-    title: 'LaptopKart',
-    subtitle: 'E-Commerce Platform',
+    title: 'LaptopKart', subtitle: 'E-Commerce Platform',
     description: 'Full-stack e-commerce with secure user registration and purchasing workflows. 10+ product listings with optimized Firestore data structures. Session security via controlled auth mechanisms.',
     tech: ['React.js', 'REST APIs', 'Firebase Auth', 'Firestore'],
     link: 'https://laptopkart-git-main-dhanshree-ratnerias-projects.vercel.app/home',
-    github: 'https://github.com/Dhanshreeratneria/Laptopkart',
-    icon: ShoppingCart,
-    accent: '#4CAF82'
+    github: 'https://github.com/Dhanshreeratneria/Laptopkart', icon: ShoppingCart, accent: '#4CAF82'
   },
   {
-    title: 'CabnCarry',
-    subtitle: 'Admin Dashboard',
+    title: 'CabnCarry', subtitle: 'Admin Dashboard',
     description: 'Scalable admin dashboard managing users, drivers, and operational workflows. Reusable UI components for consistency. RESTful APIs for real-time tracking and analytics.',
-    tech: ['React.js', 'Redux Toolkit', 'Tailwind CSS', 'REST APIs'],
-    icon: Cpu,
-    accent: '#D4975B'
+    tech: ['React.js', 'Redux Toolkit', 'Tailwind CSS', 'REST APIs'], icon: Cpu, accent: '#D4975B'
   },
   {
-    title: 'YatraBuddy',
-    subtitle: 'Travel Booking Platform',
+    title: 'YatraBuddy', subtitle: 'Travel Booking Platform',
     description: 'End-to-end travel booking and service workflows. REST APIs for authentication, booking management. Improved backend performance via optimized API handling and reduced response latency.',
     tech: ['React.js', 'Node.js', 'Express.js', 'MySQL', 'REST APIs'],
-    link: 'https://yaatrabuddy.in/',
-    icon: Globe,
-    accent: '#5BC4D4'
+    link: 'https://yaatrabuddy.in/', icon: Globe, accent: '#5BC4D4'
   },
   {
-    title: 'TerraFlow',
-    subtitle: 'Water Solution Management',
+    title: 'TerraFlow', subtitle: 'Water Solution Management',
     description: '13+ service request categories including drilling and installations. RBAC for Admin/Customer with Firebase real-time tracking. 3+ interactive dashboards with automated notifications — 40–50% efficiency boost.',
     tech: ['React.js', 'Firebase Auth', 'Firestore', 'RBAC', 'REST APIs'],
     link: 'https://terraflow-drilling-solution-and-ser.vercel.app',
-    github: 'https://github.com/Dhanshreeratneria/Terraflow-Drilling-Solution-and-Services',
-    icon: Package,
-    accent: '#6DB85C'
+    github: 'https://github.com/Dhanshreeratneria/Terraflow-Drilling-Solution-and-Services', icon: Package, accent: '#6DB85C'
   },
   {
-    title: 'Foodies',
-    subtitle: 'Food Delivery App',
+    title: 'Foodies', subtitle: 'Food Delivery App',
     description: 'Full-featured food delivery connecting customers with restaurants and homemade vendors. Complete Node.js/MongoDB backend with 100+ APIs. Admin frontend UI with full API integration.',
-    tech: ['Node.js', 'MongoDB', 'Express.js', 'REST APIs', 'React.js'],
-    icon: Utensils,
-    accent: '#D45B5B'
+    tech: ['Node.js', 'MongoDB', 'Express.js', 'REST APIs', 'React.js'], icon: Utensils, accent: '#D45B5B'
   },
   {
-    title: 'Hazaribagh Market',
-    subtitle: 'Multi-Vendor Platform',
+    title: 'Hazaribagh Market', subtitle: 'Multi-Vendor Platform',
     description: 'One-stop platform connecting multiple vendors. Complete admin section frontend, UI design, and API integration managing vendors, listings, and orders across the marketplace.',
-    tech: ['React.js', 'REST APIs', 'Admin Dashboard', 'Multi-Vendor'],
-    icon: Package,
-    accent: '#9B5BD4'
+    tech: ['React.js', 'REST APIs', 'Admin Dashboard', 'Multi-Vendor'], icon: Package, accent: '#9B5BD4'
   },
   {
-    title: 'Spring Boot CRUD',
-    subtitle: 'Backend Architecture',
+    title: 'Spring Boot CRUD', subtitle: 'Backend Architecture',
     description: 'Backend services with clean layered architecture. RESTful APIs for efficient CRUD operations using JPA and Hibernate ORM. Improved scalability through clean code practices.',
     tech: ['Java', 'Spring Boot', 'Spring Data JPA', 'MySQL', 'Hibernate'],
-    github: 'https://github.com/Dhanshreeratneria/springboot-CRUD-operation',
-    icon: Server,
-    accent: '#D4975B'
+    github: 'https://github.com/Dhanshreeratneria/springboot-CRUD-operation', icon: Server, accent: '#D4975B'
   },
   {
-    title: 'To-Do Manager',
-    subtitle: 'Task Management App',
+    title: 'To-Do Manager', subtitle: 'Task Management App',
     description: 'Daily task management with assignment, completion tracking, and progress monitoring. Persistent state handling and intuitive task lifecycle management.',
     tech: ['React.js', 'JavaScript', 'State Management'],
-    github: 'https://github.com/Dhanshreeratneria/To-do-Task-manager.git',
-    icon: ClipboardList,
-    accent: '#5BD4B8'
+    github: 'https://github.com/Dhanshreeratneria/To-do-Task-manager.git', icon: ClipboardList, accent: '#5BD4B8'
   },
 ];
 
@@ -835,15 +899,10 @@ const ProjectCard = ({ title, subtitle, description, tech, link, github, icon: I
           pointerEvents: 'none'
         }}
       />
-
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
         <motion.div
           animate={{ backgroundColor: hovered ? accent + '25' : accent + '15', borderColor: hovered ? accent + '50' : accent + '25' }}
-          style={{
-            width: 44, height: 44, borderRadius: 12,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            border: '1px solid', transition: 'all 0.3s'
-          }}
+          style={{ width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid', transition: 'all 0.3s' }}
         >
           <Icon size={20} style={{ color: accent }} />
         </motion.div>
@@ -851,12 +910,7 @@ const ProjectCard = ({ title, subtitle, description, tech, link, github, icon: I
           {link && (
             <motion.a href={link} target="_blank" rel="noopener noreferrer"
               whileHover={{ scale: 1.15, backgroundColor: accent }}
-              style={{
-                width: 32, height: 32, borderRadius: '50%', display: 'flex',
-                alignItems: 'center', justifyContent: 'center',
-                background: 'var(--ink)', color: 'var(--cream)',
-                textDecoration: 'none', transition: 'background-color 0.2s'
-              }}
+              style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ink)', color: 'var(--cream)', textDecoration: 'none', transition: 'background-color 0.2s' }}
             >
               <ArrowUpRight size={14} />
             </motion.a>
@@ -864,33 +918,18 @@ const ProjectCard = ({ title, subtitle, description, tech, link, github, icon: I
           {github && (
             <motion.a href={github} target="_blank" rel="noopener noreferrer"
               whileHover={{ scale: 1.15, backgroundColor: 'var(--ink)' }}
-              style={{
-                width: 32, height: 32, borderRadius: '50%', display: 'flex',
-                alignItems: 'center', justifyContent: 'center',
-                background: 'var(--warm)', color: 'var(--ink)',
-                textDecoration: 'none', transition: 'background-color 0.2s'
-              }}
+              style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--warm)', color: 'var(--ink)', textDecoration: 'none', transition: 'background-color 0.2s' }}
             >
               <Github size={14} />
             </motion.a>
           )}
         </div>
       </div>
-
-      <p style={{ fontSize: '0.7rem', fontFamily: 'DM Mono, monospace', color: accent, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>
-        {subtitle}
-      </p>
-      <h3 className="font-display" style={{ fontSize: '1.5rem', fontWeight: 500, color: 'var(--ink)', marginBottom: 10, letterSpacing: '-0.01em' }}>
-        {title}
-      </h3>
-      <p style={{ fontSize: '0.85rem', color: 'var(--ink-80)', lineHeight: 1.7, marginBottom: 20, flex: 1, fontWeight: 300 }}>
-        {description}
-      </p>
-
+      <p style={{ fontSize: '0.7rem', fontFamily: 'DM Mono, monospace', color: accent, letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>{subtitle}</p>
+      <h3 className="font-display" style={{ fontSize: '1.5rem', fontWeight: 500, color: 'var(--ink)', marginBottom: 10, letterSpacing: '-0.01em' }}>{title}</h3>
+      <p style={{ fontSize: '0.85rem', color: 'var(--ink-80)', lineHeight: 1.7, marginBottom: 20, flex: 1, fontWeight: 300 }}>{description}</p>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-        {tech.map(t => (
-          <span key={t} className="tag-pill" style={{ fontSize: '0.625rem' }}>{t}</span>
-        ))}
+        {tech.map(t => <span key={t} className="tag-pill" style={{ fontSize: '0.625rem' }}>{t}</span>)}
       </div>
     </motion.div>
   );
@@ -900,18 +939,12 @@ const Projects = () => (
   <section id="work" style={{ padding: '100px clamp(24px, 5vw, 80px)' }}>
     <div style={{ maxWidth: 1280, margin: '0 auto' }}>
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.7 }}
+        initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
         style={{ marginBottom: 60, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}
       >
         <div>
           <span className="section-eyebrow">Selected Work</span>
-          <h2 className="font-display" style={{
-            fontSize: 'clamp(2.25rem, 4vw, 3.5rem)', fontWeight: 400,
-            marginTop: 8, letterSpacing: '-0.02em', color: 'var(--ink)'
-          }}>
+          <h2 className="font-display" style={{ fontSize: 'clamp(2.25rem, 4vw, 3.5rem)', fontWeight: 400, marginTop: 8, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
             What I've<br /><em style={{ color: 'var(--gold)', fontStyle: 'italic', fontWeight: 300 }}>Built</em>
           </h2>
         </div>
@@ -919,8 +952,6 @@ const Projects = () => (
           9 production-ready projects spanning e-commerce, booking platforms, admin dashboards, and enterprise APIs.
         </p>
       </motion.div>
-
-      {/* FIX 2: Removed LayoutGroup wrapper — no layoutId on cards so it had no effect */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }} className="projects-grid">
         {PROJECTS.map((p, i) => <ProjectCard key={i} {...p} index={i} />)}
       </div>
@@ -933,8 +964,6 @@ const Projects = () => (
 );
 
 /* ─── Skills ────────────────────────────────────────────────────────────── */
-
-/* FIX 3: Replaced via.placeholder.com (unreliable) with a data URI fallback generator */
 const skillFallbackSrc = (letter) =>
   `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23E8DDD0'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='14' font-family='sans-serif' fill='%238A6D3B'%3E${letter}%3C/text%3E%3C/svg%3E`;
 
@@ -1002,27 +1031,14 @@ const SkillCard = ({ category, icon: Icon, skills, index }) => {
       transition={{ delay: index * 0.07, duration: 0.6 }}
       whileHover={{ y: -5, boxShadow: '0 15px 40px rgba(0,0,0,0.08)' }}
       className="card-grain"
-      style={{
-        background: 'var(--surface)', borderRadius: 20,
-        border: '1px solid var(--border)', overflow: 'hidden',
-        transition: 'transform 0.3s, box-shadow 0.3s'
-      }}
+      style={{ background: 'var(--surface)', borderRadius: 20, border: '1px solid var(--border)', overflow: 'hidden', transition: 'transform 0.3s, box-shadow 0.3s' }}
     >
-      <div style={{
-        padding: '20px 24px', borderBottom: '1px solid var(--border)',
-        display: 'flex', alignItems: 'center', gap: 10,
-        background: 'linear-gradient(135deg, rgba(184,151,90,0.06), transparent)'
-      }}>
-        <div style={{
-          width: 32, height: 32, borderRadius: 8,
-          background: 'linear-gradient(135deg, var(--gold-dk), var(--gold))',
-          display: 'flex', alignItems: 'center', justifyContent: 'center'
-        }}>
+      <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10, background: 'linear-gradient(135deg, rgba(184,151,90,0.06), transparent)' }}>
+        <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, var(--gold-dk), var(--gold))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Icon size={15} style={{ color: 'var(--cream)' }} />
         </div>
         <span className="font-display" style={{ fontSize: '1.25rem', fontWeight: 500, color: 'var(--ink)' }}>{category}</span>
       </div>
-
       <div style={{ padding: '16px 24px 24px' }}>
         {skills.map((skill, i) => (
           <motion.div
@@ -1031,15 +1047,10 @@ const SkillCard = ({ category, icon: Icon, skills, index }) => {
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ delay: index * 0.05 + i * 0.05 }}
             whileHover={{ backgroundColor: 'rgba(184,151,90,0.05)', paddingLeft: 20 }}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 12,
-              padding: '10px 12px', borderRadius: 10, marginBottom: 4,
-              transition: 'all 0.2s ease', cursor: 'default'
-            }}
+            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 10, marginBottom: 4, transition: 'all 0.2s ease', cursor: 'default' }}
           >
             <img
-              src={skill.img}
-              alt={skill.name}
+              src={skill.img} alt={skill.name}
               style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'contain', background: 'white', padding: 4, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', flexShrink: 0 }}
               onError={e => { e.currentTarget.src = skillFallbackSrc(skill.name[0]); }}
             />
@@ -1056,35 +1067,24 @@ const SkillCard = ({ category, icon: Icon, skills, index }) => {
 
 const Skills = () => (
   <section id="skills" style={{ padding: '100px clamp(24px, 5vw, 80px)', background: 'var(--warm)', position: 'relative' }}>
-    <div style={{
-      position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-      backgroundImage: 'radial-gradient(var(--border-strong) 1px, transparent 1px)',
-      backgroundSize: '32px 32px', opacity: 0.5, pointerEvents: 'none'
-    }} />
+    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundImage: 'radial-gradient(var(--border-strong) 1px, transparent 1px)', backgroundSize: '32px 32px', opacity: 0.5, pointerEvents: 'none' }} />
     <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1 }}>
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
         style={{ marginBottom: 60, textAlign: 'center' }}
       >
         <span className="section-eyebrow">Expertise</span>
-        <h2 className="font-display" style={{
-          fontSize: 'clamp(2.25rem, 4vw, 3.5rem)', fontWeight: 500,
-          marginTop: 8, letterSpacing: '-0.02em', color: 'var(--ink)'
-        }}>
+        <h2 className="font-display" style={{ fontSize: 'clamp(2.25rem, 4vw, 3.5rem)', fontWeight: 500, marginTop: 8, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
           Technical <em style={{ color: 'var(--gold)', fontStyle: 'italic', fontWeight: 300 }}>Stack</em>
         </h2>
         <p style={{ maxWidth: 480, margin: '16px auto 0', fontSize: '0.875rem', color: 'var(--ink-80)', lineHeight: 1.7, fontWeight: 300 }}>
           Tools and technologies I use daily to build fast, secure, and scalable applications.
         </p>
       </motion.div>
-
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }} className="skills-grid">
         {SKILL_CATS.map((cat, i) => <SkillCard key={i} {...cat} index={i} />)}
       </div>
     </div>
-    {/* FIX 4: Added missing quotes around 1fr in media query */}
     <style>{`
       @media(max-width:900px){ .skills-grid { grid-template-columns: repeat(2,1fr) !important; } }
       @media(max-width:560px){ .skills-grid { grid-template-columns: 1fr !important; } }
@@ -1122,25 +1122,17 @@ const Achievements = () => (
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }} className="ach-grid">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            style={{
-              background: 'var(--ink)', borderRadius: 20, padding: '32px',
-              border: '1px solid rgba(255,255,255,0.06)', position: 'relative', overflow: 'hidden'
-            }}
+            initial={{ opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
+            style={{ background: 'var(--ink)', borderRadius: 20, padding: '32px', border: '1px solid rgba(255,255,255,0.06)', position: 'relative', overflow: 'hidden' }}
           >
             <div style={{ position: 'absolute', top: 0, left: 32, right: 32, height: 2, background: 'linear-gradient(90deg, transparent, var(--gold), transparent)' }} />
             <p style={{ fontSize: '0.7rem', fontFamily: 'DM Mono, monospace', color: 'var(--gold)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 20 }}>Notable Wins</p>
             {ACHIEVEMENTS.map(({ text, icon: Icon }, i) => (
               <motion.div key={i}
-                initial={{ opacity: 0, x: -16 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12 }}
+                initial={{ opacity: 0, x: -16 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12 }}
                 whileHover={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-                style={{ display: 'flex', gap: 14, marginBottom: i < ACHIEVEMENTS.length - 1 ? 20 : 0, paddingBottom: i < ACHIEVEMENTS.length - 1 ? 20 : 0, borderBottom: i < ACHIEVEMENTS.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
+                style={{ display: 'flex', gap: 14, marginBottom: i < ACHIEVEMENTS.length - 1 ? 20 : 0, paddingBottom: i < ACHIEVEMENTS.length - 1 ? 20 : 0, borderBottom: i < ACHIEVEMENTS.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}
+              >
                 <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(184,151,90,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <Icon size={16} style={{ color: 'var(--gold)' }} />
                 </div>
@@ -1150,15 +1142,9 @@ const Achievements = () => (
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.15 }}
+            initial={{ opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.15 }}
             whileHover={{ scale: 1.02 }}
-            style={{
-              background: 'linear-gradient(135deg, var(--gold-dk), var(--gold))',
-              borderRadius: 20, padding: '32px',
-            }}
+            style={{ background: 'linear-gradient(135deg, var(--gold-dk), var(--gold))', borderRadius: 20, padding: '32px' }}
           >
             <p style={{ fontSize: '0.7rem', fontFamily: 'DM Mono, monospace', color: 'rgba(247,243,238,0.7)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 12 }}>Education</p>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
@@ -1169,51 +1155,30 @@ const Achievements = () => (
               Shri Vaishnav Vidyapeeth Vishwavidyalaya, Indore
             </p>
             <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-              <span style={{ background: 'rgba(255,255,255,0.2)', color: 'var(--cream)', padding: '4px 14px', borderRadius: 100, fontSize: '0.75rem', fontFamily: 'DM Mono, monospace' }}>
-                CGPA: 7.72/10
-              </span>
-              <span style={{ background: 'rgba(255,255,255,0.2)', color: 'var(--cream)', padding: '4px 14px', borderRadius: 100, fontSize: '0.75rem', fontFamily: 'DM Mono, monospace' }}>
-                Expected July 2026
-              </span>
+              <span style={{ background: 'rgba(255,255,255,0.2)', color: 'var(--cream)', padding: '4px 14px', borderRadius: 100, fontSize: '0.75rem', fontFamily: 'DM Mono, monospace' }}>CGPA: 7.72/10</span>
+              <span style={{ background: 'rgba(255,255,255,0.2)', color: 'var(--cream)', padding: '4px 14px', borderRadius: 100, fontSize: '0.75rem', fontFamily: 'DM Mono, monospace' }}>Expected July 2026</span>
             </div>
           </motion.div>
         </div>
 
         <motion.div
-          initial={{ opacity: 0, x: 24 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.1 }}
+          initial={{ opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.1 }}
           className="card-grain"
-          style={{
-            background: 'var(--surface)', borderRadius: 20,
-            border: '1px solid var(--border)', padding: '32px',
-            display: 'flex', flexDirection: 'column'
-          }}
+          style={{ background: 'var(--surface)', borderRadius: 20, border: '1px solid var(--border)', padding: '32px', display: 'flex', flexDirection: 'column' }}
         >
           <p style={{ fontSize: '0.7rem', fontFamily: 'DM Mono, monospace', color: 'var(--gold)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 24 }}>Certifications</p>
           <div style={{ flex: 1 }}>
             {CERTS.map((cert, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, x: 16 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.07 }}
+                initial={{ opacity: 0, x: 16 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.07 }}
                 whileHover={{ backgroundColor: 'rgba(184,151,90,0.05)', paddingLeft: 20 }}
-                style={{
-                  display: 'flex', alignItems: 'flex-start', gap: 12,
-                  padding: '12px 12px', borderRadius: 10,
-                  borderBottom: i < CERTS.length - 1 ? '1px solid var(--border)' : 'none',
-                  transition: 'all 0.2s'
-                }}
+                style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 12px', borderRadius: 10, borderBottom: i < CERTS.length - 1 ? '1px solid var(--border)' : 'none', transition: 'all 0.2s' }}
               >
                 <Award size={14} style={{ color: 'var(--gold)', marginTop: 3, flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
                   <p style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--ink)', lineHeight: 1.4 }}>{cert.title}</p>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--ink-40)', marginTop: 3, fontFamily: 'DM Mono, monospace' }}>
-                    {cert.issuer} · {cert.date}
-                  </p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--ink-40)', marginTop: 3, fontFamily: 'DM Mono, monospace' }}>{cert.issuer} · {cert.date}</p>
                 </div>
               </motion.div>
             ))}
@@ -1243,80 +1208,48 @@ const CONTACT_DETAILS = [
   { icon: Star, label: 'CGPA', value: '7.72 / 10.0' },
 ];
 
-/* FIX 5: Removed the inner AnimatePresence wrapper — the outer one in App handles exit animation */
 const ContactModal = ({ onClose }) => (
   <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    style={{
-      position: 'fixed', inset: 0, zIndex: 200,
-      background: 'rgba(13,13,13,0.7)', backdropFilter: 'blur(12px)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '24px', overflowY: 'auto'
-    }}
+    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+    style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(13,13,13,0.7)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', overflowY: 'auto' }}
     onClick={e => e.target === e.currentTarget && onClose()}
   >
     <motion.div
-      initial={{ opacity: 0, y: 40, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 40, scale: 0.95 }}
+      initial={{ opacity: 0, y: 40, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 40, scale: 0.95 }}
       transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
       className="card-grain"
-      style={{
-        background: 'var(--cream)', borderRadius: 28, width: '100%', maxWidth: 720,
-        border: '1px solid var(--border-strong)', overflow: 'hidden',
-        maxHeight: '90vh', overflowY: 'auto'
-      }}
+      style={{ background: 'var(--cream)', borderRadius: 28, width: '100%', maxWidth: 720, border: '1px solid var(--border-strong)', overflow: 'hidden', maxHeight: '90vh', overflowY: 'auto' }}
     >
-      <div style={{
-        padding: '32px 40px 28px', borderBottom: '1px solid var(--border)',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        background: 'var(--ink)', position: 'sticky', top: 0, zIndex: 1
-      }}>
+      <div style={{ padding: '32px 40px 28px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--ink)', position: 'sticky', top: 0, zIndex: 1 }}>
         <div>
           <p className="section-eyebrow" style={{ marginBottom: 4, color: 'var(--gold-lt)' }}>Let's Connect</p>
-          <h2 className="font-display" style={{ fontSize: '2rem', fontWeight: 400, color: 'var(--cream)', letterSpacing: '-0.02em' }}>
-            Contact &amp; Details
-          </h2>
+          <h2 className="font-display" style={{ fontSize: '2rem', fontWeight: 400, color: 'var(--cream)', letterSpacing: '-0.02em' }}>Contact &amp; Details</h2>
         </div>
         <motion.button
           onClick={onClose}
           whileHover={{ scale: 1.1, rotate: 90, background: 'var(--gold)' }}
-          style={{
-            width: 40, height: 40, borderRadius: '50%',
-            background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', color: 'var(--cream)', transition: 'all 0.2s'
-          }}
+          style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--cream)', transition: 'all 0.2s' }}
         >
           <X size={16} />
         </motion.button>
       </div>
 
       <div style={{ padding: '32px 40px 40px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 28 }}>
+        <div className="contact-details-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 28 }}>
           {CONTACT_DETAILS.map((d, i) => {
             const Icon = d.icon;
             return (
               <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.06 }}
+                key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
                 whileHover={{ scale: 1.02, boxShadow: '0 8px 20px rgba(0,0,0,0.05)' }}
-                style={{
-                  background: 'var(--surface)', borderRadius: 14,
-                  padding: '16px 18px', border: '1px solid var(--border)'
-                }}
+                style={{ background: 'var(--surface)', borderRadius: 14, padding: '16px 18px', border: '1px solid var(--border)' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                   <Icon size={13} style={{ color: 'var(--gold)' }} />
                   <span style={{ fontSize: '0.625rem', fontFamily: 'DM Mono, monospace', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-40)' }}>{d.label}</span>
                 </div>
                 {d.link ? (
-                  <a href={d.link} target="_blank" rel="noopener noreferrer"
-                    style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--ink)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <a href={d.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--ink)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
                     <span style={{ wordBreak: 'break-all' }}>{d.value}</span>
                     <ExternalLink size={10} style={{ color: 'var(--gold)', flexShrink: 0 }} />
                   </a>
@@ -1328,10 +1261,7 @@ const ContactModal = ({ onClose }) => (
           })}
         </div>
 
-        <div style={{
-          background: 'var(--ink)', borderRadius: 16, padding: '28px 32px',
-          marginBottom: 16, position: 'relative', overflow: 'hidden'
-        }}>
+        <div style={{ background: 'var(--ink)', borderRadius: 16, padding: '28px 32px', marginBottom: 16, position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: 0, left: 40, right: 40, height: 1, background: 'linear-gradient(90deg, transparent, var(--gold), transparent)' }} />
           <h3 className="font-display" style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--cream)', marginBottom: 12 }}>About Me</h3>
           <p style={{ fontSize: '0.875rem', color: 'rgba(247,243,238,0.7)', lineHeight: 1.75, marginBottom: 16, fontWeight: 300 }}>
@@ -1346,10 +1276,7 @@ const ContactModal = ({ onClose }) => (
           </div>
         </div>
 
-        <div style={{
-          background: 'var(--surface)', borderRadius: 14, padding: '20px 24px',
-          border: '1px solid var(--border)', display: 'flex', alignItems: 'flex-start', gap: 12
-        }}>
+        <div style={{ background: 'var(--surface)', borderRadius: 14, padding: '20px 24px', border: '1px solid var(--border)', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
           <span style={{ color: 'var(--gold)', flexShrink: 0, marginTop: 2 }}><Heart /></span>
           <div>
             <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--ink)' }}>Indore Cancer Foundation Club (2022–2025)</p>
@@ -1360,6 +1287,7 @@ const ContactModal = ({ onClose }) => (
         <p style={{ textAlign: 'center', fontSize: '0.7rem', color: 'var(--ink-40)', marginTop: 20, fontFamily: 'DM Mono, monospace', letterSpacing: '0.08em' }}>
           Languages: English · Hindi
         </p>
+        <style>{`@media(max-width:480px){ .contact-details-grid { grid-template-columns: 1fr !important; } }`}</style>
       </div>
     </motion.div>
   </motion.div>
@@ -1375,16 +1303,9 @@ const Footer = ({ onContact }) => (
           <span className="font-display" style={{ fontSize: '3.25rem', fontWeight: 400, color: 'var(--cream)', letterSpacing: '-0.02em', lineHeight: 1 }}>
             DR<span style={{ color: 'var(--gold)' }}>.</span>
           </span>
-          <p style={{ fontSize: '0.85rem', color: 'rgba(247,243,238,0.4)', marginTop: 10, fontWeight: 300 }}>
-            Full-Stack Developer · Indore, India
-          </p>
+          <p style={{ fontSize: '0.85rem', color: 'rgba(247,243,238,0.4)', marginTop: 10, fontWeight: 300 }}>Full-Stack Developer · Indore, India</p>
         </motion.div>
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          style={{ display: 'flex', gap: 16, alignItems: 'center' }}
-        >
+        <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
           {[
             { href: 'https://github.com/Dhanshreeratneria', icon: Github, label: 'GitHub' },
             { href: 'https://www.linkedin.com/in/dhanshree-ratneria-94b0a625b/', icon: Linkedin, label: 'LinkedIn' },
@@ -1392,12 +1313,7 @@ const Footer = ({ onContact }) => (
           ].map(({ href, icon: Icon, label }) => (
             <motion.a key={label} href={href} target={href.startsWith('mailto') ? undefined : '_blank'} rel="noopener noreferrer"
               whileHover={{ scale: 1.1, background: 'var(--gold)', color: 'var(--cream)', borderColor: 'var(--gold)' }}
-              style={{
-                width: 44, height: 44, borderRadius: '50%', display: 'flex',
-                alignItems: 'center', justifyContent: 'center',
-                border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(247,243,238,0.6)',
-                textDecoration: 'none', transition: 'all 0.2s'
-              }}
+              style={{ width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(247,243,238,0.6)', textDecoration: 'none', transition: 'all 0.2s' }}
             >
               <Icon size={16} />
             </motion.a>
@@ -1405,13 +1321,7 @@ const Footer = ({ onContact }) => (
           <motion.button onClick={onContact}
             whileHover={{ scale: 1.04, boxShadow: '0 8px 25px rgba(184,151,90,0.4)' }}
             whileTap={{ scale: 0.97 }}
-            style={{
-              background: 'linear-gradient(135deg, var(--gold-dk), var(--gold))',
-              color: 'var(--cream)', border: 'none', borderRadius: 100,
-              padding: '0.75rem 1.5rem', fontSize: '0.75rem', letterSpacing: '0.08em',
-              fontWeight: 600, textTransform: 'uppercase', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: 8
-            }}
+            style={{ background: 'linear-gradient(135deg, var(--gold-dk), var(--gold))', color: 'var(--cream)', border: 'none', borderRadius: 100, padding: '0.75rem 1.5rem', fontSize: '0.75rem', letterSpacing: '0.08em', fontWeight: 600, textTransform: 'uppercase', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
           >
             <Mail size={13} /> Hire Me
           </motion.button>
@@ -1449,10 +1359,10 @@ export default function App() {
         <Achievements />
       </main>
       <Footer onContact={() => setShowContact(true)} />
-      {/* FIX 5: Single AnimatePresence here is correct — ContactModal handles its own enter/exit */}
       <AnimatePresence>
         {showContact && <ContactModal onClose={() => setShowContact(false)} />}
       </AnimatePresence>
     </>
   );
-}
+} 
+
