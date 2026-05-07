@@ -778,7 +778,7 @@ const Experience = () => {
               <p style={{ fontSize: '0.8rem', color: 'rgba(247,243,238,0.5)', marginLeft: 52, fontFamily: 'DM Mono, monospace' }}>Indore, Madhya Pradesh · 4 months</p>
             </div>
             <div style={{ padding: '6px 16px', borderRadius: 100, border: '1px solid rgba(184,151,90,0.35)', fontSize: '0.75rem', color: 'var(--gold)', fontFamily: 'DM Mono, monospace', letterSpacing: '0.06em' }}>
-              2024 – 2025
+              2026
             </div>
           </div>
 
